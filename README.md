@@ -84,6 +84,11 @@ sh verify.sh /tmp/s76-full 24 --full-zm  # also zm_mixed over all 129,600 roots 
 It needs git, Python 3 with numpy, and Rust ≥ 1.86. The checkers are fetched from upstream at the
 pinned commit and not bundled.
 
+A clean run from a fresh clone took 9 min 13 s wall with 4 threads (35 CPU-minutes) on an
+i7-14700K under WSL2: 75 s for the zmx2 sweep and the rest for zm_mixed on the 64 sub-roots. Each
+zm_mixed job prints `VERIFIED-D4 (PARTIAL)` because it covers only its own sub-root;
+`tools/check_coverage.py` then checks that the pieces tile the whole region.
+
 ## How the cover was found (not part of the proof)
 
 - **Corners.** The four corner regions are taken from wand125's certified s(59) = 8 cover, with

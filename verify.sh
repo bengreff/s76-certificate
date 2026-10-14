@@ -7,9 +7,10 @@
 #               fetch Evan Daniel's checkers at a pinned commit (not bundled) and verify their sha256;
 #               zmx2 d4      (exact D4 invariance of the cover)
 #               zmx2 cert --d4 over all 8,100 roots; the roots it leaves uncertified must be exactly
-#                            records/zmx2/failing_roots.txt (minutes);
+#                            records/zmx2/failing_roots.txt (about 5 CPU-minutes);
 #               zm_mixed cert on the 64 sub-roots of those roots (records/zm_mixed/jobs.txt), exact
-#                            rational arithmetic (a few CPU-hours);
+#                            rational arithmetic (about 30 CPU-minutes); each job prints
+#                            "VERIFIED-D4 (PARTIAL)" because it covers only its own sub-root;
 #               tools/check_coverage.py on the fresh zmx2 log and the fresh zm_mixed records.
 #   --full-zm : also zm_mixed over the whole D4 region (all 129,600 roots; several hundred CPU-hours).
 #
