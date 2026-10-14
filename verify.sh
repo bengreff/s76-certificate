@@ -83,5 +83,6 @@ if [ "$FULL" = 1 ]; then
   echo "== zm_mixed over the whole D4 region (long)"
   (cd "$U/search" && python3 -u zm_mixed.py cert "$COVER" $ZARGS --nproc "$THREADS" --resume "$WORK/zm_full.jsonl" --manifest "$WORK/zm_full_manifest.json") > "$WORK/zm_full.log" 2>&1
   tail -3 "$WORK/zm_full.log"
+  if grep -q "NOT VERIFIED" "$WORK/zm_full.log" || ! grep -q "VERIFIED" "$WORK/zm_full.log"; then echo "zm_mixed full pass: NOT VERIFIED" >&2; exit 1; fi
 fi
 echo "== s(76) >= 9 certified; with the 9x9 grid, s(76) = 9"

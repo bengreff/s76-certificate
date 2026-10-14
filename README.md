@@ -59,6 +59,8 @@ Records:
 - `records/zm_mixed/j*.jsonl` has one record per root, including the census. Each header carries
   the cover's sha256.
 - `records/zm_mixed/jobs.txt` lists the 64 sub-roots.
+- `records/toolchain.txt` gives the compiler, the zmx2 binary hash and the Python version of the
+  clean replay.
 
 ## Lean
 
