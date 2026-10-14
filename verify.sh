@@ -12,7 +12,10 @@
 #                            rational arithmetic (about 30 CPU-minutes); each job prints
 #                            "VERIFIED-D4 (PARTIAL)" because it covers only its own sub-root;
 #               tools/check_coverage.py on the fresh zmx2 log and the fresh zm_mixed records.
-#   --full-zm : also zm_mixed over the whole D4 region (all 129,600 roots; several hundred CPU-hours).
+#   always, if records/zm_full exists: tools/check_full.py on the shipped records of the full zm_mixed pass
+#               (seconds; it checks the records, it does not redo the computation).
+#   --full-zm : also zm_mixed over the whole D4 region (all 129,600 roots; about 180 CPU-hours), then the single-root
+#               reruns at greater depth listed in records/zm_full/rerun.txt, then tools/check_full.py.
 #
 # Needs git, Python 3 with numpy, and Rust >= 1.86 (cargo; set CARGO to choose a toolchain).
 set -eu
@@ -79,10 +82,22 @@ echo "zm_mixed: all sub-roots VERIFIED"
 echo "== coverage"
 python3 "$HERE/tools/check_coverage.py" "$WORK/zmx2.log" "$WORK/zm_mixed" "$COVER_SHA"
 
+if [ -d "$HERE/records/zm_full" ]; then
+  echo "== shipped records of the full zm_mixed pass (records/zm_full)"
+  python3 "$HERE/tools/check_full.py" "$COVER_SHA" "$HERE"/records/zm_full/roots.jsonl.gz "$HERE"/records/zm_full/rerun*.jsonl
+fi
+
 if [ "$FULL" = 1 ]; then
   echo "== zm_mixed over the whole D4 region (long)"
-  (cd "$U/search" && python3 -u zm_mixed.py cert "$COVER" $ZARGS --nproc "$THREADS" --resume "$WORK/zm_full.jsonl" --manifest "$WORK/zm_full_manifest.json") > "$WORK/zm_full.log" 2>&1
+  (cd "$U/search" && python3 -u zm_mixed.py cert "$COVER" $ZARGS --nproc "$THREADS" --resume "$WORK/zm_full.jsonl" --manifest "$WORK/zm_full_manifest.json") > "$WORK/zm_full.log" 2>&1 || true
   tail -3 "$WORK/zm_full.log"
-  if grep -q "NOT VERIFIED" "$WORK/zm_full.log" || ! grep -q "VERIFIED" "$WORK/zm_full.log"; then echo "zm_mixed full pass: NOT VERIFIED" >&2; exit 1; fi
+  echo "== zm_mixed reruns of single roots at greater depth (records/zm_full/rerun.txt)"
+  i=0
+  while read -r a b c d e f depth; do
+    (cd "$U/search" && python3 -u zm_mixed.py cert "$COVER" $ZARGS --depth "$depth" --nproc 1 --cx-lo "$a" --cx-hi "$b" --cy-lo "$c" --cy-hi "$d" --u-lo "$e" --u-hi "$f" --resume "$WORK/zm_rerun$i.jsonl") > "$WORK/zm_rerun$i.log" 2>&1 || true
+    tail -1 "$WORK/zm_rerun$i.log"
+    i=$((i + 1))
+  done < "$HERE/records/zm_full/rerun.txt"
+  python3 "$HERE/tools/check_full.py" "$COVER_SHA" "$WORK/zm_full.jsonl" "$WORK"/zm_rerun*.jsonl
 fi
 echo "== s(76) >= 9 certified; with the 9x9 grid, s(76) = 9"

@@ -10,3 +10,7 @@ python    3.11.17, numpy 2.4.6
 
 Control: changing one weight of the cover by 1/(4*10^8) (line 40) makes `zmx2 d4` refuse it with
 "ERROR: --d4: cover is not D4-invariant: ..." and exit status 2, which stops verify.sh (set -e).
+
+Second route (records/zm_full): zm_mixed.py over the whole D4 region with --nproc 24 on the same host
+(Python 3.11.17, numpy 2.4.6), 2026-10-13 19:31 to 2026-10-14 03:13 CDT: 27,729 s wall, 651,314 CPU-s.
+Root R rerun alone at depth 34 (rerun_R_depth34.sh): 2,733 s wall, 2,661 CPU-s.

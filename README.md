@@ -52,6 +52,8 @@ would capture mass ≥ 76, which is a contradiction.
 | covering | `zmx2 cert --d4` (outward-rounded binary64) | 8,100 roots of 1/10 × 1/10 × 1/8 | 8,096 certified; 4 with uncertified boxes; no root capped |
 | covering | `zm_mixed.py cert --d4 --cert-mode --disj --chain-from 0 --pitch 1/20 --ubins 16 --depth 24` (exact rationals) | the 4 remaining roots, split into 64 roots of 1/20 × 1/20 × 1/32 | 64 certified, 0 uncertified boxes |
 | coverage | `tools/check_coverage.py` | — | the zmx2 roots tile the region; the 64 zm_mixed roots tile the 4 remaining ones |
+| covering, second route | `zm_mixed.py cert`, same flags, over the whole region (exact rationals) | all 129,600 roots of 1/20 × 1/20 × 1/32 | 2,227,114 boxes; 129,599 roots certified at depth 24; the last root R certified alone at depth 34 |
+| coverage, second route | `tools/check_full.py` | — | every one of the 129,600 roots is certified by the full run or the rerun |
 
 Records:
 
@@ -59,8 +61,26 @@ Records:
 - `records/zm_mixed/j*.jsonl` has one record per root, including the census. Each header carries
   the cover's sha256.
 - `records/zm_mixed/jobs.txt` lists the 64 sub-roots.
+- `records/zm_full/` holds the second route: `roots.jsonl.gz` (one record per root of the full run),
+  its `manifest.json` and log, and the rerun of R (`rerun_R_depth34.*`, listed in `rerun.txt`).
 - `records/toolchain.txt` gives the compiler, the zmx2 binary hash and the Python version of the
   clean replay.
+
+### Second route: zm_mixed alone
+
+zm_mixed was also run over the whole fundamental region with the same flags, independently of zmx2.
+At depth 24 it certifies 129,599 of the 129,600 roots and leaves 6 boxes uncertified in one root,
+R = [27/20, 7/5] × [13/10, 27/20] × [1/4, 9/32]. R lies in a corner inherited unchanged from wand125's
+s(59) cover: a unit square centred in R stays inside [0, 2.5)². Their full zm_mixed run of s(59)
+also left 6 boxes uncertified in this root. Run alone at depth 34, R certifies with 13,767 boxes and
+none uncertified, which is again the same count as for s(59). The full run took 181 CPU-hours (7.7 h on 24
+processes); the rerun took 44 CPU-minutes.
+
+So the covering statement holds by zm_mixed's exact arithmetic alone, as well as by the zmx2 and
+zm_mixed composite above. `tools/check_full.py` checks the records: every root of the region has
+a record, each header names this cover and the pinned checker files, and each root is certified
+in the full run or the rerun. It rejects the records if the rerun is left out, if one record is
+dropped, if the rerun is marked uncertified, or if the cover hash differs.
 
 ## Lean
 
@@ -82,7 +102,7 @@ theorem s76_eq_9 (hcov : S76Cover) : minSide 76 = 9
 
 ```sh
 sh verify.sh /tmp/s76-check 8          # checker hashes, exact total, zmx2 d4 and cert, zm_mixed on the 64 roots, coverage
-sh verify.sh /tmp/s76-full 24 --full-zm  # also zm_mixed over all 129,600 roots of the D4 region (long)
+sh verify.sh /tmp/s76-full 24 --full-zm  # also zm_mixed over all 129,600 roots and the rerun of R (about 180 CPU-hours)
 ```
 
 It needs git, Python 3 with numpy, and Rust ≥ 1.86. The checkers are fetched from upstream at the
@@ -92,6 +112,7 @@ A clean run from a fresh clone took 9 min 13 s wall with 4 threads (35 CPU-minut
 i7-14700K under WSL2: 75 s for the zmx2 sweep and the rest for zm_mixed on the 64 sub-roots. Each
 zm_mixed job prints `VERIFIED-D4 (PARTIAL)` because it covers only its own sub-root;
 `tools/check_coverage.py` then checks that the pieces tile the whole region.
+The default run also applies `tools/check_full.py` to the shipped records of the second route, in seconds.
 
 ## How the cover was found (not part of the proof)
 
