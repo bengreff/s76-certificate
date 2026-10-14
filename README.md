@@ -1,5 +1,7 @@
 # s(76) = 9
 
+Benjamin Greff, October 2026.
+
 Let s(n) be the least side of a square that holds n non-overlapping unit squares with
 arbitrary orientations. This repository contains a computer-assisted proof of
 
@@ -116,5 +118,5 @@ zm_mixed job prints `VERIFIED-D4 (PARTIAL)` because it covers only its own sub-r
   `zeromargin.py`, and the Lean library.
 - **wand125** ([wand125/square-packing](https://github.com/wand125/square-packing), MIT): the s(59) = 8
   cover reused for the corners, the band-insertion construction, and the pinned toolchain.
-- The search, LP and verification pipeline were built and run with Claude (Anthropic) as an AI
-  assistant under the author's direction.
+- **Benjamin Greff** directed the work. The search, LP and verification pipeline were built and run
+  with Claude (Anthropic) as an AI assistant.
